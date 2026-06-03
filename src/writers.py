@@ -5,11 +5,9 @@ Async writer coroutines for the trades and orphans Parquet files.
 
 Each writer:
   - Drains its queue into an in-memory buffer
-  - Flushes to Parquet when FLUSH_ROWS is reached OR FLUSH_INTERVAL_S seconds
-    have elapsed, whichever comes first
-  - Never blocks the event loop — all disk I/O is isolated here
-  - On any exit (including Ctrl+C / CancelledError), the finally block drains
-    the queue and flushes remaining rows before closing the file
+  - Flushes to Parquet when FLUSH_ROWS is reached OR FLUSH_INTERVAL_S seconds have elapsed, whichever comes first
+  - Never blocks the event loop (all disk I/O is isolated here)
+  - On any exit (KeyboardInterrupt / CancelledError), the finally block drains the queue and flushes remaining rows before closing the file
 """
 import asyncio
 import time
@@ -30,6 +28,7 @@ async def trades_writer(path: str) -> None:
     writer     = pq.ParquetWriter(path, TRADES_SCHEMA)
     buffer:    list = []
     last_flush = time.monotonic()
+    total_rows = 0
 
     try:
         while True:
@@ -37,7 +36,7 @@ async def trades_writer(path: str) -> None:
                 timeout = max(config.FLUSH_INTERVAL_S - (time.monotonic() - last_flush), 0.01)
                 row     = await asyncio.wait_for(state.trades_queue.get(), timeout=timeout)
                 buffer.append(row)
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError: # no new rows arrived within the flush interval
                 pass
 
             if buffer and (
@@ -45,6 +44,8 @@ async def trades_writer(path: str) -> None:
                 or time.monotonic() - last_flush >= config.FLUSH_INTERVAL_S
             ):
                 write_trades_batch(writer, buffer)
+                total_rows += len(buffer)
+                print(f"[trades] Flushed {len(buffer)} rows — {total_rows} total matched trades")
                 buffer.clear()
                 last_flush = time.monotonic()
     finally:
@@ -65,6 +66,7 @@ async def orphans_writer(path: str) -> None:
     writer     = pq.ParquetWriter(path, ORPHANS_SCHEMA)
     buffer:    list = []
     last_flush = time.monotonic()
+    total_rows = 0
 
     try:
         while True:
@@ -80,6 +82,8 @@ async def orphans_writer(path: str) -> None:
                 or time.monotonic() - last_flush >= config.FLUSH_INTERVAL_S
             ):
                 write_orphans_batch(writer, buffer)
+                total_rows += len(buffer)
+                print(f"[orphans] Flushed {len(buffer)} rows — {total_rows} total orphans")
                 buffer.clear()
                 last_flush = time.monotonic()
     finally:
