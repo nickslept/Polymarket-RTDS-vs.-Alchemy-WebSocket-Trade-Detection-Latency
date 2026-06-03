@@ -35,6 +35,7 @@ async def polymarket_listener(ready_event: asyncio.Event) -> None:
         # First message back from the server is treated as the subscription ack.
         ack_raw        = await asyncio.wait_for(ws.recv(), timeout=config.SUB_ACK_TIMEOUT_S)
         ack_arrival_ns = time.perf_counter_ns()
+        print(f"[connection] Polymarket subscription ack received.")
         ready_event.set()
 
         # The ack itself could be a trade on a very busy market — process it.
@@ -90,6 +91,7 @@ async def alchemy_listener(
         ack     = json.loads(ack_raw)
         if "result" not in ack:
             raise RuntimeError(f"Unexpected Alchemy ack: {ack_raw}")
+        print(f"[connection] Alchemy subscription ack received.")
         ready_event.set()
 
         async for raw in ws:
