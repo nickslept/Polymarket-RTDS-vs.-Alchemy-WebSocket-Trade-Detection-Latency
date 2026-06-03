@@ -42,7 +42,7 @@ async def _poly_ping_loop(ws) -> None:
 
 
 async def polymarket_listener(ready_event: asyncio.Event) -> None:
-    async with websockets.connect(_POLY_WS_URL) as ws:
+    async with websockets.connect(_POLY_WS_URL, close_timeout=1) as ws:
         await ws.send(_POLY_SUB)
         print(f"[connection] Polymarket subscription sent.")
         ready_event.set()  # polymarket doesn't send an ack upon subscription 
@@ -81,7 +81,7 @@ async def alchemy_listener(
     ws_url:             str,
     order_filled_topic: str,
 ) -> None:
-    async with websockets.connect(ws_url) as ws:
+    async with websockets.connect(ws_url, close_timeout=1) as ws:
         sub_payload = json.dumps({
             "jsonrpc": "2.0",
             "id":      1,
