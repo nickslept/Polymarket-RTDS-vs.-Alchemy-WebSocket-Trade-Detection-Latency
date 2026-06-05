@@ -7,4 +7,5 @@
 *REMINDER: DO NOT CHANGE ORPHANS B/C AN ORPHAN CAN BE UNMATCHED OR CLEARED ON DISCONNECT
 
 REVIEW:
-- writers, hashmap, connections, listeners (more extensively)
+- first: check main and go to each .py file as it comes up
+- alternatively: writers, hashmap, connections, listeners (more extensively)
