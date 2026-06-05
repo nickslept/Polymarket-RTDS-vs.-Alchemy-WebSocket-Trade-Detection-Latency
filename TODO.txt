@@ -2,7 +2,7 @@
 
 - in config.py: change up ttl names (e.g. "seconds" is inconsistent), change ttl comments to make it more accurate
 - in state.py: clarify run start ns comment (the exact type of timestamp, and how it's used), maybe add comments for queues if not explained elsewhere
-
+- in main.py: maybe change input into something more standard
 
 *REMINDER: DO NOT CHANGE ORPHANS B/C AN ORPHAN CAN BE UNMATCHED OR CLEARED ON DISCONNECT
 
