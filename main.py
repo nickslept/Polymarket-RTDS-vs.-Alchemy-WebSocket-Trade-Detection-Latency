@@ -18,11 +18,11 @@ from src.writers import trades_writer, orphans_writer
 
 
 async def main() -> None:
-    # --- User input -----------------------------------------------------------
+    # --- User input ---
     api_key     = input("Enter Alchemy API key: ").strip()
     alchemy_url = f"wss://polygon-mainnet.g.alchemy.com/v2/{api_key}"
 
-    # --- Output paths ---------------------------------------------------------
+    # --- Output paths ---
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     run_ts       = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     trades_path  = os.path.join(config.OUTPUT_DIR, f"trades_{run_ts}.parquet")
@@ -30,12 +30,12 @@ async def main() -> None:
     print(f"[startup] Writing trades  → {trades_path}")
     print(f"[startup] Writing orphans → {orphans_path}")
 
-    # --- Initialise shared state (must happen before coroutines start) --------
+    # --- Initialize shared state ---  
     state.trades_queue  = asyncio.Queue()
     state.orphans_queue = asyncio.Queue()
     state.run_start_ns  = time.perf_counter_ns()
 
-    # --- Launch all coroutines ------------------------------------------------
+    # --- Launch all coroutines concurrently ---
     await asyncio.gather(
         run_connections(alchemy_url, config.ORDER_FILLED_TOPIC),
         trades_writer(trades_path),
