@@ -95,8 +95,8 @@ def clear_hashmap_on_disconnect() -> None:
 
 async def ttl_sweep() -> None:
     """
-    Runs every TTL_CHECK_INTERVAL_S seconds.  Any entry whose first-arrived
-    timestamp is older than TTL_SECONDS is evicted and logged as 'unmatched'.
+    Runs every TTL_CHECK_INTERVAL_S seconds.
+    Any entry whose first-arrived timestamp is older than TTL_SECONDS seconds is evicted and added to the orphans queue with a reason of "unmatched" to be added to the orphans parquet.
     """
     while True:
         await asyncio.sleep(config.TTL_CHECK_INTERVAL_S)
