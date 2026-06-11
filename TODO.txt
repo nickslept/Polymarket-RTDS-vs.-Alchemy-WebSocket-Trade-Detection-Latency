@@ -1,15 +1,10 @@
-- GENERAL/NEED TO LOOK THROUGH EACH .PY FILE:  
-
 - in config.py: change up ttl names (e.g. "seconds" is inconsistent), change ttl comments to make it more accurate
 - in state.py: clarify run start ns comment (the exact type of timestamp, and how it's used), maybe add comments for queues if not explained elsewhere
 - in main.py: change input into something more standard like environment variables
 - in hashmap.py: rename ttl sweep to smt more accurate (e.g. hashmap garbage collection or smt similar. also change variable names across the program for ttl when it isn't truly ttl)
 
-*REMINDER: DO NOT CHANGE ORPHANS B/C AN ORPHAN CAN BE UNMATCHED OR CLEARED ON DISCONNECT
+GENERAL:
+- fix up the multi-line comments at the top of each .py file
 
-REVIEW:
-- first: check main and go to each .py file as it comes up
-- alternatively: writers, hashmap, connections, listeners (more extensively)
-
-must do later:
+New features:
 - in main.py add something to check for data completeness by adding the starting block and ending block approximation so u can verify that all trades in all blocks are present
