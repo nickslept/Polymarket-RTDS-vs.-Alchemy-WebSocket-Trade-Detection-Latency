@@ -39,6 +39,10 @@ Each handler:
     - Checks whether the other pipeline has already arrived and if so, enqueues the matched trade + deletes the entry from the hashmap.
 """
 def handle_poly_event(tx_hash: str, rel_ns: int) -> None:
+    """
+    Handles adding Polymarket rtds events (keyed by transaction hash, value is the specific pipeline's relative timestamp) to the hashmap.
+    Enqueues matched trades when both pipelines have arrived and removes the entry from the hashmap.
+    """
     entry = state.hashmap.get(tx_hash)
     if entry is None:
         state.hashmap[tx_hash] = {"poly_rel_ns": rel_ns, "alchemy_rel_ns": None}
@@ -52,6 +56,10 @@ def handle_poly_event(tx_hash: str, rel_ns: int) -> None:
 
 
 def handle_alchemy_event(tx_hash: str, rel_ns: int) -> None:
+    """
+    Handles adding Alchemy events (keyed by transaction hash, value is the specific pipeline's relative timestamp) to the hashmap.
+    Enqueues matched trades when both pipelines have arrived and removes the entry from the hashmap.
+    """
     entry = state.hashmap.get(tx_hash)
     if entry is None:
         state.hashmap[tx_hash] = {"poly_rel_ns": None, "alchemy_rel_ns": rel_ns}
@@ -64,9 +72,7 @@ def handle_alchemy_event(tx_hash: str, rel_ns: int) -> None:
         del state.hashmap[tx_hash]
 
 
-# ---------------------------------------------------------------------------
-# Disconnect cleanup — called by the connection manager on any drop
-# ---------------------------------------------------------------------------
+# --- Hashmap cleanup upon disconnect (called by the connection manager) ---
 
 def clear_hashmap_on_disconnect() -> None:
     """
