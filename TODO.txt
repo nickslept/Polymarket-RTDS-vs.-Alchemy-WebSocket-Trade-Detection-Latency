@@ -9,3 +9,6 @@
 REVIEW:
 - first: check main and go to each .py file as it comes up
 - alternatively: writers, hashmap, connections, listeners (more extensively)
+
+must do later:
+- in main.py add something to check for data completeness by adding the starting block and ending block approximation so u can verify that all trades in all blocks are present
