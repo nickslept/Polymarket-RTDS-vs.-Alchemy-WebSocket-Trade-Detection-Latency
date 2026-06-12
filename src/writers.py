@@ -43,10 +43,13 @@ async def trades_writer(path: str) -> None:
                 buffer.append(state.trades_queue.get_nowait())
             except Exception:
                 break
+        print(f"[writers] Shutting down trades writer... Draining {len(buffer)} rows before shutdown.")
         try:
             if buffer:
                 write_trades_batch(writer, buffer)
+                total_rows += len(buffer)
             writer.close()
+            print(f"[writers] Trades writer closed. Total rows written: {total_rows}.")
         except Exception as e:
             print(f"[writers] Error flushing trades: {e}")
 
@@ -81,9 +84,12 @@ async def orphans_writer(path: str) -> None:
                 buffer.append(state.orphans_queue.get_nowait())
             except Exception:
                 break
+        print(f"[writers] Shutting down orphans writer... Draining {len(buffer)} rows before shutdown.")
         try:
             if buffer:
                 write_orphans_batch(writer, buffer)
+                total_rows += len(buffer)
             writer.close()
+            print(f"[writers] Orphans writer closed. Total rows written: {total_rows}.")
         except Exception as e:
             print(f"[writers] Error flushing orphans: {e}")
