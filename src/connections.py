@@ -14,19 +14,19 @@ async def run_connections(alchemy_url: str, order_filled_topic: str) -> None:
         poly_ready    = asyncio.Event()
         alchemy_ready = asyncio.Event()
 
-        poly_task    = asyncio.create_task(polymarket_listener(poly_ready))
+        poly_task    = asyncio.create_task(polymarket_listener(poly_ready), name="Polymarket")
         alchemy_task = asyncio.create_task(
-            alchemy_listener(alchemy_ready, alchemy_url, order_filled_topic)
+            alchemy_listener(alchemy_ready, alchemy_url, order_filled_topic), name="Alchemy"
         )
 
         try:
             await asyncio.wait_for(
                 asyncio.gather(poly_ready.wait(), alchemy_ready.wait()),
                 timeout=config.SUB_ACK_TIMEOUT_S,
-            )
+            ) # wait for both listeners to be ready before proceeding
             state.data_valid = True
             backoff          = config.RECONNECT_BASE_S
-            print("[connections] Both subscriptions live — collecting data.")
+            print("[connections] Both subscriptions live. Collecting data...")
 
             done, _ = await asyncio.wait(
                 [poly_task, alchemy_task],
@@ -36,16 +36,16 @@ async def run_connections(alchemy_url: str, order_filled_topic: str) -> None:
                 try:
                     exc = task.exception()
                     if exc:
-                        print(f"[connections] Dropped with error: {exc}")
+                        print(f"[connections] {task.get_name()} dropped with error: {exc}")
                     else:
-                        print("[connections] Connection closed cleanly.")
+                        print(f"[connections] {task.get_name()} connection closed cleanly.")
                 except asyncio.CancelledError:
                     pass
 
         except asyncio.TimeoutError:
             print(
                 f"[connections] Subscription ack timed out after "
-                f"{config.SUB_ACK_TIMEOUT_S}s — will retry."
+                f"{config.SUB_ACK_TIMEOUT_S} seconds. Will retry."
             )
         except Exception as e:
             print(f"[connections] Unexpected error: {e}")
