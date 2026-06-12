@@ -9,6 +9,7 @@ import src.state as state
 from src.hashmap import handle_poly_event, handle_alchemy_event
 
 
+# --- Polymarket WebSocket connection parameters ---
 _POLY_WS_URL = "wss://ws-live-data.polymarket.com"
 _POLY_SUB    = json.dumps({
     "action": "subscribe",
@@ -16,16 +17,17 @@ _POLY_SUB    = json.dumps({
         {"topic": "activity", "type": "trades"}
     ]
 })
-_POLY_PING_INTERVAL_S = 5
+_POLY_PING_INTERVAL_SECONDS = 5
 
 
+# --- Ping loop for Polymarket WebSocket connection ---
 async def _poly_ping_loop(ws) -> None:
-    """Send a text 'ping' every 5 seconds to keep the connection alive."""
+    """Sends a ping every [_POLY_PING_INTERVAL_SECONDS] seconds to keep the Polymarket WebSocket connection alive."""
     while True:
-        await asyncio.sleep(_POLY_PING_INTERVAL_S)
+        await asyncio.sleep(_POLY_PING_INTERVAL_SECONDS)
         await ws.send("ping")
 
-
+# --- Polymarket WebSocket listener ---
 async def polymarket_listener(ready_event: asyncio.Event) -> None:
     async with websockets.connect(_POLY_WS_URL, close_timeout=1) as ws:
         await ws.send(_POLY_SUB)
@@ -41,7 +43,7 @@ async def polymarket_listener(ready_event: asyncio.Event) -> None:
                 if not state.data_valid:
                     continue
 
-                # server sends back pongs — skip anything that isn't JSON
+                # server sends back pongs — anything that isn't JSON is skipped
                 if not raw.startswith("{"):
                     continue
 
@@ -61,6 +63,7 @@ async def polymarket_listener(ready_event: asyncio.Event) -> None:
                 pass
 
 
+# --- Alchemy WebSocket listener ---
 async def alchemy_listener(
     ready_event:        asyncio.Event,
     ws_url:             str,
