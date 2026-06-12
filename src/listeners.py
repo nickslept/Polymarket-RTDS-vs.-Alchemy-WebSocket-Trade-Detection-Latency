@@ -32,7 +32,7 @@ async def polymarket_listener(ready_event: asyncio.Event) -> None:
     async with websockets.connect(_POLY_WS_URL, close_timeout=1) as ws:
         await ws.send(_POLY_SUB)
         print(f"[connection] Polymarket subscription sent.")
-        ready_event.set()  # polymarket doesn't send an ack upon subscription 
+        ready_event.set()  # polymarket doesn't send an ack upon subscription, so we proceed with the assumption that the subscription was successful
 
         ping_task = asyncio.create_task(_poly_ping_loop(ws))
 
@@ -41,26 +41,26 @@ async def polymarket_listener(ready_event: asyncio.Event) -> None:
                 arrival_perf_ns = time.perf_counter_ns()  
 
                 if not state.data_valid:
-                    continue
+                    continue #skips the newest trade if the alchemy connection dropped so you don't populate the hashmap with trades that will never be matched
 
-                # server sends back pongs — anything that isn't JSON is skipped
+                
                 if not raw.startswith("{"):
-                    continue
+                    continue # server sends back pongs — anything that isn't JSON is skipped
 
                 try:
                     msg     = json.loads(raw)
                     payload = msg.get("payload", {})
                     tx_hash = payload.get("transactionHash")
                     if tx_hash:
-                        handle_poly_event(tx_hash, arrival_perf_ns - state.run_start_ns)
+                        handle_poly_event(tx_hash, arrival_perf_ns - state.run_start_ns) #if the transaction hash evaluates to None (bc it isn't present in the payload), then the data is skipped/not sent to handle_poly_event()
                 except Exception:
                     pass
         finally:
-            ping_task.cancel()
+            ping_task.cancel() #stops the ping loop
             try:
                 await ping_task
             except asyncio.CancelledError:
-                pass
+                pass #intended behavior
 
 
 # --- Alchemy WebSocket listener ---
