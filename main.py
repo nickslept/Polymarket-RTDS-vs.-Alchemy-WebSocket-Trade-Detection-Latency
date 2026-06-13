@@ -1,10 +1,3 @@
-"""
-- Prompts the user for an Alchemy API key.
-- Initializes the output directory and creates filenames for the output Parquet files.
-- Sets up the shared state for the tool.
-- Launches all coroutines concurrently to handle WebSocket connections, writing the parquet files, and clearing the hashmap.
-- Handles keyboard interrupts.
-"""
 import asyncio
 import os
 import time

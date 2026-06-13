@@ -1,8 +1,3 @@
-"""
-src/schemas.py
-==============
-Pyarrow schemas for the two output Parquet files, and the synchronous batch write helpers called by the writer coroutines.
-"""
 import pyarrow as pa
 import pyarrow.parquet as pq
 

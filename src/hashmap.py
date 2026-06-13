@@ -1,16 +1,3 @@
-"""
-src/hashmap.py
-==============
-All hashmap read/write operations and the TTL sweep coroutine.
-
-The hashmap is keyed by transactionHash.  Each entry holds the relative
-arrival timestamp (ns since run start) for each pipeline, or None if that
-side has not yet arrived.  When both slots are filled the entry is removed
-and the completed trade is enqueued for the writer.
-
-First-arrival-wins: if the same pipeline fires more than once for the same
-tx hash, all arrivals after the first are silently discarded.
-"""
 import asyncio
 import time
 
