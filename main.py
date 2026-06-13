@@ -6,7 +6,7 @@ from datetime import datetime
 import config
 import src.state as state
 from src.connections import run_connections
-from src.hashmap import ttl_sweep
+from src.hashmap import evict_unmatched_trades
 from src.writers import trades_writer, orphans_writer
 
 
@@ -35,7 +35,7 @@ async def main() -> None:
         run_connections(alchemy_url, config.ORDER_FILLED_TOPIC),
         trades_writer(trades_path),
         orphans_writer(orphans_path),
-        ttl_sweep(),
+        evict_unmatched_trades(),
     )
 
 

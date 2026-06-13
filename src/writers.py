@@ -29,7 +29,7 @@ async def trades_writer(path: str) -> None:
                 pass
 
             if buffer and (
-                len(buffer) >= config.FLUSH_ROWS
+                len(buffer) >= config.FLUSH_ROW_THRESHOLD
                 or time.monotonic() - last_flush >= config.FLUSH_INTERVAL_SECONDS
             ):
                 write_trades_batch(writer, buffer)
@@ -70,7 +70,7 @@ async def orphans_writer(path: str) -> None:
                 pass
 
             if buffer and (
-                len(buffer) >= config.FLUSH_ROWS
+                len(buffer) >= config.FLUSH_ROW_THRESHOLD
                 or time.monotonic() - last_flush >= config.FLUSH_INTERVAL_SECONDS
             ):
                 write_orphans_batch(writer, buffer)

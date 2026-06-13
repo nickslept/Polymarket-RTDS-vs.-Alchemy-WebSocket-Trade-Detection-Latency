@@ -78,18 +78,18 @@ def clear_hashmap_on_disconnect() -> None:
     state.hashmap.clear()
 
 
-# --- TTL sweep (garbage collection for hashmap) ---
+# --- Unmatched trade eviction ---
 
-async def ttl_sweep() -> None:
+async def evict_unmatched_trades() -> None:
     """
-    Runs every TTL_CHECK_INTERVAL_SECONDS seconds.
-    Any entry whose first-arrived timestamp is older than TTL_SECONDS seconds is evicted and added to the orphans queue with a reason of "unmatched" to be added to the orphans parquet.
+    Runs every EVICTION_INTERVAL_SECONDS seconds.
+    Any entry whose first-arrived timestamp is older than MATCH_TIMEOUT_SECONDS seconds is evicted and added to the orphans queue with a reason of "unmatched" to be added to the orphans parquet.
     """
     while True:
-        await asyncio.sleep(config.TTL_CHECK_INTERVAL_SECONDS)
+        await asyncio.sleep(config.EVICTION_INTERVAL_SECONDS)
 
         now_rel_ns = time.perf_counter_ns() - state.run_start_ns #elapsed time since run started
-        cutoff_ns  = config.TTL_SECONDS * 1_000_000_000 #convert TTL_SECONDS to nanoseconds
+        cutoff_ns  = config.MATCH_TIMEOUT_SECONDS * 1_000_000_000 #convert MATCH_TIMEOUT_SECONDS to nanoseconds
 
         to_evict = [
             tx_hash for tx_hash, entry in state.hashmap.items()
