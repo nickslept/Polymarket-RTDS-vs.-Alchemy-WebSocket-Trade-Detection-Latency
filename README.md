@@ -109,8 +109,8 @@ pyarrow>=14.0
 Clone the repository (requires [Git](https://git-scm.com/)), or download the ZIP from GitHub and extract it. Then `cd` into the project root. All remaining commands are run from there.
  
 ```powershell
-git clone https://github.com/nickslept/Polymarket-RTDS-vs.-Alchemy-WebSocket-Trade-Detection-Latency.git
-cd Polymarket-RTDS-vs.-Alchemy-WebSocket-Trade-Detection-Latency
+git clone https://github.com/nickslept/Polymarket-RTDS-vs.-Alchemy-WebSocket-Latency-Benchmark.git
+cd Polymarket-RTDS-vs.-Alchemy-WebSocket-Latency-Benchmark
 ```
  
 **2. Create and activate a virtual environment:**
