@@ -3,7 +3,6 @@ GENERAL:
 
 FILE-SPECIFIC:
 - in config.py: change up ttl names (e.g. "seconds" is inconsistent), change ttl comments to make it more accurate
-- in state.py: clarify run start ns comment (the exact type of timestamp, and how it's used), maybe add comments for queues if not explained elsewhere
 - in hashmap.py: rename ttl sweep to smt more accurate (e.g. hashmap garbage collection or smt similar. also change variable names across the program for ttl when it isn't truly ttl)
 
 New features:
